@@ -2,62 +2,61 @@ trigger:
   - main  # Trigger pipeline on changes to the main branch
 
 pool:
-  name: 'self-hosted'  # Name of the agent pool that contains your self-hosted agent
-
-variables:
-  buildConfiguration: 'Release'
+  vmImage: 'ubuntu-latest'  # Using a Linux agent
 
 stages:
   # Continuous Integration (CI)
-  - stage: Build
+  - stage: BuildAndTest
+    displayName: 'Build and Test Node.js Application'
     jobs:
-      - job: BuildAndTest
+      - job: BuildAndTestJob
         displayName: 'Build and Test Job'
         steps:
           # Step 1: Checkout code from GitHub
           - checkout: self
 
-          # Step 2: Install Node.js (for React and Node.js projects)
-          - task: UseNode@1
+          # Step 2: Install Node.js (manual or using UseNode@2 if available)
+          - script: |
+              curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+              sudo apt-get install -y nodejs
+              node -v
+              npm -v
             displayName: 'Install Node.js'
-            inputs:
-              version: '18.20.5'  # Adjust Node.js version if needed
 
           # Step 3: Install dependencies
           - script: |
               npm install
             displayName: 'Install Dependencies'
 
-          # Step 4: Prepare SonarCloud analysis
-          - task: SonarCloudPrepare@1
-            displayName: 'Prepare SonarCloud Analysis'
-            inputs:
-              SonarCloud: 'SonarCloudServiceConnection'  # Replace with your service connection name
-              organization: 'devopsgroupassignment'      # Replace with your SonarCloud organization key
-              projectKey: 'COMP308_GroupProject'         # Replace with your SonarCloud project key
-              projectName: 'COMP308_GroupProject'  # Replace with your project name
-
-          # Step 5: Build the React application
+          # Step 4: Run Unit Tests (if tests are available)
           - script: |
-              npm run build
-            displayName: 'Build React Application'
-
-          # Step 6: Run unit tests and generate coverage
-          - script: |
-              npm test -- --coverage
+              npm test
             displayName: 'Run Unit Tests'
 
-          # Step 7: Publish test results
+          # Step 5: Publish Test Results
           - task: PublishTestResults@2
             displayName: 'Publish Test Results'
             inputs:
               testResultsFiles: '**/test-results.xml'
-              testRunTitle: 'Unit Test Results'
+              testRunTitle: 'Node.js Unit Test Results'
 
-          # Step 8: Run SonarCloud analysis
-          - task: SonarCloudAnalyze@1
-            displayName: 'Run SonarCloud Analysis'
+  # Deployment Stages (Optional for Mock Deployment)
+  - stage: DeployToDev
+    displayName: 'Deploy to Development Environment'
+    dependsOn: BuildAndTest
+    jobs:
+      - job: DeployDevJob
+        displayName: 'Deploy Job for Development'
+        steps:
+          - script: echo "Mock Deploying to Development Environment..."
+            displayName: 'Mock Deployment to Dev'
 
-          # Step 9: Publish SonarCloud quality gate results
-          - task: SonarCloudPublish@1
-            displayName: 'Publish Quality Gate Results'
+  - stage: DeployToProduction
+    displayName: 'Deploy to Production Environment'
+    dependsOn: DeployToDev
+    jobs:
+      - job: DeployProdJob
+        displayName: 'Deploy Job for Production'
+        steps:
+          - script: echo "Mock Deploying to Production Environment..."
+            displayName: 'Mock Deployment to Prod'
