@@ -1,0 +1,33 @@
+trigger:
+  - main  # Trigger pipeline on changes to the main branch
+
+pool:
+  name: 'self-hosted'  # Specify the agent pool containing your self-hosted agent
+  
+stages:
+  # Continuous Integration (CI)
+  - stage: BuildAndTest
+    displayName: 'Build and Test Node.js Application'
+    jobs:
+      - job: BuildAndTestJob
+        displayName: 'Build and Test Job'
+        steps:
+          # Step 1: Checkout code from GitHub
+          - checkout: self
+
+          # Step 3: Install dependencies
+          - script: |
+              npm install
+            displayName: 'Install Dependencies'
+
+          # Step 4: Run Unit Tests (if tests are available)
+          - script: |
+              npm test
+            displayName: 'Run Unit Tests'
+
+          # Step 5: Publish Test Results
+          - task: PublishTestResults@2
+            displayName: 'Publish Test Results'
+            inputs:
+              testResultsFiles: '**/test-results.xml'
+              testRunTitle: 'Node.js Unit Test Results'
