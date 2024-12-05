@@ -23,8 +23,8 @@ stages:
               organization: 'devopsgroupassignment' # Replace with your SonarCloud organization key
               scannerMode: 'CLI'
               configMode: 'manual'
-              cliProjectKey: 'NodeJsApp'
-              cliProjectName: 'Node.js Application'
+              cliProjectKey: 'COMP308_GroupProject'
+              cliProjectName: 'COMP308_GroupProject'
               cliProjectVersion: '1.0'
 
           # Step 3 Install dependencies
