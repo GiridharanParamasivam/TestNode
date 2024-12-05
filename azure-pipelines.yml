@@ -12,51 +12,47 @@ stages:
       - job: BuildAndTestJob
         displayName: 'Build and Test Job'
         steps:
-          # Step 1: Checkout code from GitHub
+          # Step 1 Checkout code from GitHub
           - checkout: self
 
-          # Step 2: Install dependencies
+          # Step 2 Prepare SonarQube analysis
+          - task: SonarCloudPrepare@1
+            displayName: 'Prepare SonarCloud Analysis'
+            inputs:
+              SonarCloud: 'SonarCloudServiceConnection' # Replace with your service connection name
+              organization: 'your-sonarcloud-organization' # Replace with your SonarCloud organization key
+              scannerMode: 'CLI'
+              configMode: 'manual'
+              cliProjectKey: 'NodeJsApp'
+              cliProjectName: 'Node.js Application'
+              cliProjectVersion: '1.0'
+
+          # Step 3 Install dependencies
           - script: |
               npm install
             displayName: 'Install Dependencies'
 
-          # Step 3: Prepare SonarCloud Analysis
-          - task: SonarCloudPrepare@1
-            displayName: 'Prepare SonarCloud Analysis'
-            inputs:
-              SonarCloud: 'SonarCloudServiceConnection'  # Replace with your service connection name
-              organization: 'devopsgroupassignment'      # Replace with your SonarCloud organization key
-              projectKey: 'COMP308_GroupProject'         # Replace with your SonarCloud project key
-              projectName: 'COMP308_GroupProject'  # Replace with your project name
-
-          # Step 4: Run Unit Tests (if tests are available)
+          # Step 4 Run Unit Tests (if tests are available)
           - script: |
-             npx jest testcontroller.test.js --coverage  # Ensure tests are running with coverage
-             displayName: 'Run Unit Tests with Coverage'
+              npx jest testcontroller.test.js
+            displayName: 'Run Unit Tests'
 
-          # Step 5: Publish Code Coverage (optional but recommended)
-          - task: PublishCodeCoverageResults@1
-            inputs:
-              codeCoverageTool: 'JUnit'
-              summaryFileLocation: '**/coverage/lcov-report/index-lcov-report.xml'  # Adjust if needed
-              reportDirectory: '**/coverage'  # Adjust this based on where coverage reports are generated
-              failIfCoverageFails: false
-            displayName: 'Publish Code Coverage Results'
+          # Step 5 Perform SonarQube Analysis
+          - task: SonarQubeAnalyze@5
+            displayName: 'Run SonarQube Analysis'
 
-          # Step 6: Publish Test Results
+          # Step 6 Publish Test Results
           - task: PublishTestResults@2
             displayName: 'Publish Test Results'
             inputs:
-              testResultsFiles: '**/test-results.xml'
+              testResultsFiles: 'test-results.xml'
               testRunTitle: 'Node.js Unit Test Results'
 
-          # Step 7: Run SonarCloud Analysis
-          - task: SonarCloudAnalyze@1
-            displayName: 'Run SonarCloud Analysis'
-
-          # Step 8: Publish SonarCloud Quality Gate Status
-          - task: SonarCloudPublish@1
-            displayName: 'Publish SonarCloud Quality Gate Status'
+          # Step 7 Publish SonarQube Report
+          - task: SonarQubePublish@5
+            displayName: 'Publish SonarQube Quality Gate Result'
+            inputs:
+              pollingTimeoutSec: '300'
 
   # Deliver Stage
   - stage: Deliver
@@ -81,9 +77,9 @@ stages:
         displayName: 'Deploy to Development'
         steps:
           - script: |
-              echo "Deploying to Development Environment..."
+              echo Deploying to Development Environment...
               npm install --production
-              echo "Development Deployment Completed"
+              echo Development Deployment Completed
             displayName: 'Deploy Application to Dev'
 
   # Deploy to QAT
@@ -96,9 +92,9 @@ stages:
         displayName: 'Deploy to QAT'
         steps:
           - script: |
-              echo "Deploying to QAT Environment..."
-              echo "Running QAT-specific setup..."
-              echo "QAT Deployment Completed"
+              echo Deploying to QAT Environment...
+              echo Running QAT-specific setup...
+              echo QAT Deployment Completed
             displayName: 'Deploy Application to QAT'
 
   # Deploy to Staging
@@ -111,9 +107,9 @@ stages:
         displayName: 'Deploy to Staging'
         steps:
           - script: |
-              echo "Deploying to Staging Environment..."
-              echo "Running Staging-specific setup..."
-              echo "Staging Deployment Completed"
+              echo Deploying to Staging Environment...
+              echo Running Staging-specific setup...
+              echo Staging Deployment Completed
             displayName: 'Deploy Application to Staging'
 
   # Deploy to Production
@@ -126,7 +122,7 @@ stages:
         displayName: 'Deploy to Production'
         steps:
           - script: |
-              echo "Deploying to Production Environment..."
-              echo "Running Production-specific setup..."
-              echo "Production Deployment Completed"
+              echo Deploying to Production Environment...
+              echo Running Production-specific setup...
+              echo Production Deployment Completed
             displayName: 'Deploy Application to Production'
