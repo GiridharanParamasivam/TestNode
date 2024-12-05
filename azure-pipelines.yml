@@ -2,7 +2,9 @@ trigger:
   - main  # Trigger pipeline on changes to the main branch
 
 pool:
-  name: 'self-hosted'  # Specify the agent pool containing your self-hosted agent
+  name: 'Default'  # Specify the agent pool containing your self-hosted agent
+  demands:
+    - agent.name -equals self-hosted  # Ensure the agent name matches your self-hosted agent
 
 stages:
   # Continuous Integration (CI)
@@ -15,13 +17,13 @@ stages:
           # Step 1: Checkout code from GitHub
           - checkout: self
 
-          # Step 2: Install Node.js (manual or using UseNode@2 if available)
+          # Step 2: Install Node.js on Windows
           - script: |
-              curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
-              sudo apt-get install -y nodejs
+              curl -o node-v16.20.0-x64.msi https://nodejs.org/dist/v16.20.0/node-v16.20.0-x64.msi
+              msiexec /i node-v16.20.0-x64.msi /quiet /qn
               node -v
               npm -v
-            displayName: 'Install Node.js'
+            displayName: 'Install Node.js on Windows'
 
           # Step 3: Install dependencies
           - script: |
@@ -39,24 +41,3 @@ stages:
             inputs:
               testResultsFiles: '**/test-results.xml'
               testRunTitle: 'Node.js Unit Test Results'
-
-  # Deployment Stages (Optional for Mock Deployment)
-  - stage: DeployToDev
-    displayName: 'Deploy to Development Environment'
-    dependsOn: BuildAndTest
-    jobs:
-      - job: DeployDevJob
-        displayName: 'Deploy Job for Development'
-        steps:
-          - script: echo "Mock Deploying to Development Environment..."
-            displayName: 'Mock Deployment to Dev'
-
-  - stage: DeployToProduction
-    displayName: 'Deploy to Production Environment'
-    dependsOn: DeployToDev
-    jobs:
-      - job: DeployProdJob
-        displayName: 'Deploy Job for Production'
-        steps:
-          - script: echo "Mock Deploying to Production Environment..."
-            displayName: 'Mock Deployment to Prod'
