@@ -15,14 +15,6 @@ stages:
           # Step 1: Checkout code from GitHub
           - checkout: self
 
-          # Step 2: Install Node.js on Windows
-          - script: |
-              curl -o node-v16.20.0-x64.msi https://nodejs.org/dist/v16.20.0/node-v16.20.0-x64.msi
-              msiexec /i node-v16.20.0-x64.msi /quiet /qn
-              node -v
-              npm -v
-            displayName: 'Install Node.js on Windows'
-
           # Step 3: Install dependencies
           - script: |
               npm install
