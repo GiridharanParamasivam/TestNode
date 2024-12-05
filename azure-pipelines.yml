@@ -20,17 +20,43 @@ stages:
               npm install
             displayName: 'Install Dependencies'
 
-          # Step 3: Run Unit Tests (if tests are available)
+          # Step 3: Prepare SonarCloud Analysis
+          - task: SonarCloudPrepare@1
+            displayName: 'Prepare SonarCloud Analysis'
+            inputs:
+              SonarCloud: 'SonarCloudServiceConnection'  # Replace with your service connection name
+              organization: 'devopsgroupassignment'      # Replace with your SonarCloud organization key
+              projectKey: 'COMP308_GroupProject'         # Replace with your SonarCloud project key
+              projectName: 'COMP308_GroupProject'  # Replace with your project name
+
+          # Step 4: Run Unit Tests (if tests are available)
           - script: |
               npx jest test/controller.test.js
             displayName: 'Run Unit Tests'
 
-          # Step 4: Publish Test Results
+          # Step 5: Publish Code Coverage (optional but recommended)
+          - task: PublishCodeCoverageResults@1
+            inputs:
+              codeCoverageTool: 'JUnit'
+              summaryFileLocation: '**/coverage/coverage-summary.json'  # Adjust the path as per your setup
+              reportDirectory: '**/coverage'  # Adjust this based on where coverage reports are generated
+              failIfCoverageFails: false
+            displayName: 'Publish Code Coverage Results'
+
+          # Step 6: Publish Test Results
           - task: PublishTestResults@2
             displayName: 'Publish Test Results'
             inputs:
               testResultsFiles: '**/test-results.xml'
               testRunTitle: 'Node.js Unit Test Results'
+
+          # Step 7: Run SonarCloud Analysis
+          - task: SonarCloudAnalyze@1
+            displayName: 'Run SonarCloud Analysis'
+
+          # Step 8: Publish SonarCloud Quality Gate Status
+          - task: SonarCloudPublish@1
+            displayName: 'Publish SonarCloud Quality Gate Status'
 
   # Deliver Stage
   - stage: Deliver
