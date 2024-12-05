@@ -31,14 +31,14 @@ stages:
 
           # Step 4: Run Unit Tests (if tests are available)
           - script: |
-              npx jest test/controller.test.js
-            displayName: 'Run Unit Tests'
+              npx jest --coverage  # Ensure tests are running with coverage
+            displayName: 'Run Unit Tests with Coverage'
 
           # Step 5: Publish Code Coverage (optional but recommended)
           - task: PublishCodeCoverageResults@1
             inputs:
               codeCoverageTool: 'JUnit'
-              summaryFileLocation: '**/coverage/coverage-summary.json'  # Adjust the path as per your setup
+              summaryFileLocation: '**/coverage/lcov-report/index-lcov-report.xml'  # Adjust if needed
               reportDirectory: '**/coverage'  # Adjust this based on where coverage reports are generated
               failIfCoverageFails: false
             displayName: 'Publish Code Coverage Results'
