@@ -2,7 +2,7 @@ trigger:
   - main  # Trigger pipeline on changes to the main branch
 
 pool:
-  name: 'Default'  # Specify the agent pool containing your self-hosted agent
+  name: 'self-hosted'  # Specify the agent pool containing your self-hosted agent
   demands:
     - agent.name -equals self-hosted  # Ensure the agent name matches your self-hosted agent
 
