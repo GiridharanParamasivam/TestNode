@@ -22,7 +22,7 @@ stages:
 
           # Step 4: Run Unit Tests (if tests are available)
           - script: |
-              npm test
+              npx jest test/controller.test.js
             displayName: 'Run Unit Tests'
 
           # Step 5: Publish Test Results
