@@ -31,8 +31,8 @@ stages:
 
           # Step 4: Run Unit Tests (if tests are available)
           - script: |
-              npx jest --coverage  # Ensure tests are running with coverage
-            displayName: 'Run Unit Tests with Coverage'
+             npx jest testcontroller.test.js --coverage  # Ensure tests are running with coverage
+             displayName: 'Run Unit Tests with Coverage'
 
           # Step 5: Publish Code Coverage (optional but recommended)
           - task: PublishCodeCoverageResults@1
