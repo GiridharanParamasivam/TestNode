@@ -2,7 +2,9 @@ trigger:
   - main  # Trigger pipeline on changes to the main branch
 
 pool:
-  vmImage: 'ubuntu-latest'  # Using a Linux image for React/Node.js
+  name: 'self-hosted'  # Name of the agent pool that contains your self-hosted agent
+  demands: 
+    - agent.name -equals self-hosted  # Ensure the agent name matches your self-hosted agent name
 
 variables:
   buildConfiguration: 'Release'
