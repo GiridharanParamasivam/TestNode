@@ -3,9 +3,7 @@ trigger:
 
 pool:
   name: 'self-hosted'  # Specify the agent pool containing your self-hosted agent
-  demands:
-    - agent.name -equals self-hosted  # Ensure the agent name matches your self-hosted agent
-
+  
 stages:
   # Continuous Integration (CI)
   - stage: BuildAndTest
