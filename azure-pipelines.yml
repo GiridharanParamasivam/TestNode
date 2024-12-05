@@ -1,0 +1,63 @@
+trigger:
+  - main  # Trigger pipeline on changes to the main branch
+
+pool:
+  vmImage: 'ubuntu-latest'  # Using a Linux image for React/Node.js
+
+variables:
+  buildConfiguration: 'Release'
+
+stages:
+  # Continuous Integration (CI)
+  - stage: Build
+    jobs:
+      - job: BuildAndTest
+        displayName: 'Build and Test Job'
+        steps:
+          # Step 1: Checkout code from GitHub
+          - checkout: self
+
+          # Step 2: Install Node.js (for React and Node.js projects)
+          - task: UseNode@2
+            displayName: 'Install Node.js'
+            inputs:
+              version: '18.20.5'  # Adjust Node.js version if needed
+
+          # Step 3: Install dependencies
+          - script: |
+              npm install
+            displayName: 'Install Dependencies'
+
+          # Step 4: Prepare SonarCloud analysis
+          - task: SonarCloudPrepare@1
+            displayName: 'Prepare SonarCloud Analysis'
+            inputs:
+              SonarCloud: 'SonarCloudServiceConnection'  # Replace with your service connection name
+              organization: 'devopsgroupassignment'      # Replace with your SonarCloud organization key
+              projectKey: 'COMP308_GroupProject'         # Replace with your SonarCloud project key
+              projectName: 'COMP308_GroupProject'  # Replace with your project name
+
+          # Step 5: Build the React application
+          - script: |
+              npm run build
+            displayName: 'Build React Application'
+
+          # Step 6: Run unit tests and generate coverage
+          - script: |
+              npm test -- --coverage
+            displayName: 'Run Unit Tests'
+
+          # Step 7: Publish test results
+          - task: PublishTestResults@2
+            displayName: 'Publish Test Results'
+            inputs:
+              testResultsFiles: '**/test-results.xml'
+              testRunTitle: 'Unit Test Results'
+
+          # Step 8: Run SonarCloud analysis
+          - task: SonarCloudAnalyze@1
+            displayName: 'Run SonarCloud Analysis'
+
+          # Step 9: Publish SonarCloud quality gate results
+          - task: SonarCloudPublish@1
+            displayName: 'Publish Quality Gate Results'
