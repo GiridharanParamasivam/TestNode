@@ -20,7 +20,7 @@ stages:
             displayName: 'Prepare SonarCloud Analysis'
             inputs:
               SonarCloud: 'SonarCloudServiceConnection' # Replace with your service connection name
-              organization: 'your-sonarcloud-organization' # Replace with your SonarCloud organization key
+              organization: 'devopsgroupassignment' # Replace with your SonarCloud organization key
               scannerMode: 'CLI'
               configMode: 'manual'
               cliProjectKey: 'NodeJsApp'
@@ -34,7 +34,7 @@ stages:
 
           # Step 4 Run Unit Tests (if tests are available)
           - script: |
-              npx jest testcontroller.test.js
+              npx jest test/controller.test.js
             displayName: 'Run Unit Tests'
 
           # Step 5 Perform SonarQube Analysis
