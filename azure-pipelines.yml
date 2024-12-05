@@ -2,7 +2,7 @@ trigger:
   - main  # Trigger pipeline on changes to the main branch
 
 pool:
-  vmImage: 'ubuntu-latest'  # Using a Linux agent
+  name: 'self-hosted'  # Specify the agent pool containing your self-hosted agent
 
 stages:
   # Continuous Integration (CI)
