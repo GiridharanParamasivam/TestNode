@@ -31,7 +31,9 @@ stages:
           - script: |
               npm install
             displayName: 'Install Dependencies'
-
+          - script: |
+              npm run build
+            displayName: 'Compile Project'
           # Step 4 Run Unit Tests (if tests are available)
           - script: |
               npx jest test/controller.test.js
